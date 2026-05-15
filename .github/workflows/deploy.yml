@@ -6,30 +6,34 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: web
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install Expo CLI
-        run: npm install -g expo-cli
+          cache: npm
+          cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
         run: npm install
-        working-directory: web
 
-      - name: Build Expo Web
+      - name: Install Expo
+        run: npm install expo
+
+      - name: Build web app
         run: npx expo export --platform web
-        working-directory: web
 
-      - name: Upload build artifacts
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-build
